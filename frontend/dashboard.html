@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JD Education - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div class="header-left">
+                <h1><i class="fas fa-graduation-cap"></i> JD Education Admin</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <img id="user-avatar" src="images/logo.png" alt="User">
+                    <span id="user-name">Admin</span>
+                </div>
+                <button id="logout-btn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+        
+        <div class="admin-body">
+            <nav class="admin-nav">
+                <ul>
+                    <li>
+                        <a href="#" class="active" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-section="contacts">
+                            <i class="fas fa-envelope"></i> Contact Submissions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-section="teachers">
+                            <i class="fas fa-chalkboard-teacher"></i> Manage Teachers
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-section="courses">
+                            <i class="fas fa-book"></i> Manage Courses
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-section="students">
+                            <i class="fas fa-users"></i> Manage Students
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-section="website">
+                            <i class="fas fa-globe"></i> Website Content
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-section="settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <main class="admin-main">
+                <!-- Dashboard Section -->
+                <section id="dashboard-section" class="admin-section active">
+                    <h2><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon bg-primary">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-contacts">0</h3>
+                                <p>Contact Submissions</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-success">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-teachers">0</h3>
+                                <p>Active Teachers</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-warning">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-courses">0</h3>
+                                <p>Available Courses</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon bg-danger">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-students">0</h3>
+                                <p>Registered Students</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-card">
+                            <h3><i class="fas fa-chart-line"></i> Monthly Enrollments</h3>
+                            <canvas id="enrollments-chart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3><i class="fas fa-chart-pie"></i> Course Distribution</h3>
+                            <canvas id="courses-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-activity">
+                        <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                        <div class="activity-list" id="activity-feed">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Contact Submissions Section -->
+                <section id="contacts-section" class="admin-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-envelope"></i> Contact Form Submissions</h2>
+                        <div class="section-actions">
+                            <div class="search-bar">
+                                <input type="text" id="contact-search" placeholder="Search contacts...">
+                                <button class="search-btn"><i class="fas fa-search"></i></button>
+                            </div>
+                            <div class="filter-group">
+                                <select id="status-filter">
+                                    <option value="all">All Statuses</option>
+                                    <option value="new">New</option>
+                                    <option value="contacted">Contacted</option>
+                                    <option value="admitted">Admitted</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                            <button id="export-contacts" class="btn-secondary">
+                                <i class="fas fa-file-export"></i> Export CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="contacts-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>10th %</th>
+                                    <th>12th %</th>
+                                    <th>Course</th>
+                                    <th>Message</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination">
+                        <button id="prev-page" disabled><i class="fas fa-chevron-left"></i></button>
+                        <span id="page-info">Page 1 of 1</span>
+                        <button id="next-page" disabled><i class="fas fa-chevron-right"></i></button>
+                        <select id="page-size">
+                            <option value="10">10 per page</option>
+                            <option value="25">25 per page</option>
+                            <option value="50">50 per page</option>
+                            <option value="100">100 per page</option>
+                        </select>
+                    </div>
+                </section>
+                
+                <!-- Teachers Section -->
+                <section id="teachers-section" class="admin-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chalkboard-teacher"></i> Manage Teachers</h2>
+                        <div class="section-actions">
+                            <div class="search-bar">
+                                <input type="text" id="teacher-search" placeholder="Search teachers...">
+                                <button class="search-btn"><i class="fas fa-search"></i></button>
+                            </div>
+                            <button id="add-teacher-btn" class="btn-primary">
+                                <i class="fas fa-plus"></i> Add New Teacher
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="teachers-grid" id="teachers-container">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </section>
+                
+                <!-- Courses Section -->
+                <section id="courses-section" class="admin-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-book"></i> Manage Courses</h2>
+                        <div class="section-actions">
+                            <div class="search-bar">
+                                <input type="text" id="course-search" placeholder="Search courses...">
+                                <button class="search-btn"><i class="fas fa-search"></i></button>
+                            </div>
+                            <button id="add-course-btn" class="btn-primary">
+                                <i class="fas fa-plus"></i> Add New Course
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="courses-grid" id="courses-container">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </section>
+                
+                <!-- Students Section -->
+                <section id="students-section" class="admin-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-users"></i> Manage Students</h2>
+                        <div class="section-actions">
+                            <div class="search-bar">
+                                <input type="text" id="student-search" placeholder="Search students...">
+                                <button class="search-btn"><i class="fas fa-search"></i></button>
+                            </div>
+                            <button id="add-student-btn" class="btn-primary">
+                                <i class="fas fa-plus"></i> Add New Student
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="students-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Courses</th>
+                                    <th>Join Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination">
+                        <button id="prev-student-page" disabled><i class="fas fa-chevron-left"></i></button>
+                        <span id="student-page-info">Page 1 of 1</span>
+                        <button id="next-student-page" disabled><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </section>
+                
+                <!-- Website Content Section -->
+                <section id="website-section" class="admin-section">
+                    <h2><i class="fas fa-globe"></i> Website Content Management</h2>
+                    
+                    <div class="website-tabs">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-tab="contact-info">Contact Info</button>
+                            <button class="tab-btn" data-tab="homepage">Homepage</button>
+                            <button class="tab-btn" data-tab="about">About Page</button>
+                            <button class="tab-btn" data-tab="testimonials">Testimonials</button>
+                        </div>
+                        
+                        <div class="tab-content active" id="contact-info-tab">
+                            <form id="website-info-form">
+                                <div class="form-group">
+                                    <label for="website-email">Email</label>
+                                    <input type="email" id="website-email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="website-phone">Phone</label>
+                                    <input type="tel" id="website-phone" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="website-address">Address</label>
+                                    <textarea id="website-address" rows="3" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="website-social">Social Media Links (JSON)</label>
+                                    <textarea id="website-social" rows="3"></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="tab-content" id="homepage-tab">
+                            <form id="homepage-form">
+                                <div class="form-group">
+                                    <label for="homepage-title">Main Title</label>
+                                    <input type="text" id="homepage-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="homepage-subtitle">Subtitle</label>
+                                    <input type="text" id="homepage-subtitle" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="homepage-hero-image">Hero Image URL</label>
+                                    <div class="image-upload-container">
+                                        <input type="text" id="homepage-hero-image" required>
+                                        <input type="file" id="hero-image-upload" accept="image/*">
+                                        <div class="image-preview" id="hero-image-preview"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="homepage-features">Key Features</label>
+                                    <div id="features-container">
+                                        <!-- Features will be added here -->
+                                    </div>
+                                    <button type="button" id="add-feature-btn" class="btn-secondary">
+                                        <i class="fas fa-plus"></i> Add Feature
+                                    </button>
+                                </div>
+                                <div class="form-group">
+                                    <label for="homepage-content">Main Content</label>
+                                    <div id="homepage-editor" style="height: 300px;"></div>
+                                </div>
+                                <button type="submit" class="btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                        
+                        <div class="tab-content" id="about-tab">
+                            <form id="about-form">
+                                <div class="form-group">
+                                    <label for="about-title">Page Title</label>
+                                    <input type="text" id="about-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="about-banner-image">Banner Image URL</label>
+                                    <div class="image-upload-container">
+                                        <input type="text" id="about-banner-image" required>
+                                        <input type="file" id="about-image-upload" accept="image/*">
+                                        <div class="image-preview" id="about-image-preview"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="about-mission">Our Mission</label>
+                                    <div id="mission-editor" style="height: 200px;"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="about-vision">Our Vision</label>
+                                    <div id="vision-editor" style="height: 200px;"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="about-history">Our History</label>
+                                    <div id="history-editor" style="height: 300px;"></div>
+                                </div>
+                                <button type="submit" class="btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                        
+                        <div class="tab-content" id="testimonials-tab">
+                            <div class="section-actions">
+                                <button id="add-testimonial-btn" class="btn-primary">
+                                    <i class="fas fa-plus"></i> Add New Testimonial
+                                </button>
+                            </div>
+                            <div class="testimonials-grid" id="testimonials-container">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Settings Section -->
+                <section id="settings-section" class="admin-section">
+                    <h2><i class="fas fa-cog"></i> System Settings</h2>
+                    
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <h3><i class="fas fa-user-shield"></i> Admin Users</h3>
+                            <div class="admin-users-list" id="admin-users">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                            <button id="add-admin-btn" class="btn-secondary">
+                                <i class="fas fa-user-plus"></i> Add Admin
+                            </button>
+                        </div>
+                        
+                        <div class="settings-card">
+                            <h3><i class="fas fa-bell"></i> Notification Settings</h3>
+                            <form id="notification-settings">
+                                <div class="form-group checkbox-group">
+                                    <input type="checkbox" id="email-notifications" checked>
+                                    <label for="email-notifications">Enable Email Notifications</label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="notification-email">Notification Email</label>
+                                    <input type="email" id="notification-email">
+                                </div>
+                                <div class="form-group checkbox-group">
+                                    <input type="checkbox" id="new-contact-notify" checked>
+                                    <label for="new-contact-notify">Notify on new contact submissions</label>
+                                </div>
+                                <div class="form-group checkbox-group">
+                                    <input type="checkbox" id="new-student-notify" checked>
+                                    <label for="new-student-notify">Notify on new student registrations</label>
+                                </div>
+                                <button type="submit" class="btn-primary">Save Settings</button>
+                            </form>
+                        </div>
+                        
+                        <div class="settings-card">
+                            <h3><i class="fas fa-lock"></i> Change Password</h3>
+                            <form id="password-form">
+                                <div class="form-group">
+                                    <label for="current-password">Current Password</label>
+                                    <input type="password" id="current-password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-password">New Password</label>
+                                    <input type="password" id="new-password" required>
+                                    <div class="password-strength" id="password-strength">
+                                        <div class="strength-meter"></div>
+                                        <span class="strength-text">Password Strength</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm-password">Confirm New Password</label>
+                                    <input type="password" id="confirm-password" required>
+                                </div>
+                                <button type="submit" class="btn-primary">Change Password</button>
+                            </form>
+                        </div>
+                        
+                        <div class="settings-card">
+                            <h3><i class="fas fa-database"></i> Data Management</h3>
+                            <div class="data-actions">
+                                <button id="backup-btn" class="btn-secondary">
+                                    <i class="fas fa-download"></i> Create Backup
+                                </button>
+                                <button id="restore-btn" class="btn-secondary">
+                                    <i class="fas fa-upload"></i> Restore Backup
+                                </button>
+                                <input type="file" id="backup-file" accept=".json" style="display: none;">
+                            </div>
+                            <div class="form-group">
+                                <label for="auto-backup">Automatic Backups</label>
+                                <select id="auto-backup">
+                                    <option value="disabled">Disabled</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <button id="save-data-settings" class="btn-primary">Save Settings</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Teacher Modal -->
+    <div id="teacher-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-title">Add New Teacher</h2>
+            <form id="teacher-form">
+                <input type="hidden" id="teacher-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teacher-name">Full Name</label>
+                        <input type="text" id="teacher-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacher-email">Email</label>
+                        <input type="email" id="teacher-email" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teacher-subject">Subject/Department</label>
+                        <input type="text" id="teacher-subject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacher-qualification">Highest Qualification</label>
+                        <input type="text" id="teacher-qualification">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teacher-experience">Years of Experience</label>
+                        <input type="number" id="teacher-experience" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="teacher-specialization">Specialization</label>
+                        <input type="text" id="teacher-specialization">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="teacher-bio">Bio</label>
+                    <textarea id="teacher-bio" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="teacher-image">Image URL</label>
+                    <div class="image-upload-container">
+                        <input type="text" id="teacher-image" required>
+                        <input type="file" id="teacher-image-upload" accept="image/*">
+                        <div class="image-preview" id="teacher-image-preview"></div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Teacher</button>
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Course Modal -->
+    <div id="course-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="course-modal-title">Add New Course</h2>
+            <form id="course-form">
+                <input type="hidden" id="course-id">
+                <div class="form-group">
+                    <label for="course-name">Course Name</label>
+                    <input type="text" id="course-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="course-category">Category</label>
+                    <select id="course-category">
+                        <option value="academic">Academic</option>
+                        <option value="professional">Professional</option>
+                        <option value="language">Language</option>
+                        <option value="test-prep">Test Preparation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="course-description">Description</label>
+                    <div id="course-editor" style="height: 200px;"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="course-duration">Duration (months)</label>
+                        <input type="number" id="course-duration" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="course-price">Price (₹)</label>
+                        <input type="number" id="course-price" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="course-image">Image URL</label>
+                    <div class="image-upload-container">
+                        <input type="text" id="course-image">
+                        <input type="file" id="course-image-upload" accept="image/*">
+                        <div class="image-preview" id="course-image-preview"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="course-syllabus">Syllabus (PDF URL)</label>
+                    <input type="text" id="course-syllabus">
+                    <input type="file" id="syllabus-upload" accept=".pdf">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Course</button>
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Student Modal -->
+    <div id="student-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="student-modal-title">Add New Student</h2>
+            <form id="student-form">
+                <input type="hidden" id="student-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student-name">Full Name</label>
+                        <input type="text" id="student-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-email">Email</label>
+                        <input type="email" id="student-email" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student-phone">Phone</label>
+                        <input type="tel" id="student-phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student-dob">Date of Birth</label>
+                        <input type="date" id="student-dob">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="student-address">Address</label>
+                    <textarea id="student-address" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="student-parent">Parent/Guardian Name</label>
+                    <input type="text" id="student-parent">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student-10th">10th Percentage</label>
+                        <input type="number" id="student-10th" min="0" max="100" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="student-12th">12th Percentage</label>
+                        <input type="number" id="student-12th" min="0" max="100" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="student-courses">Enrolled Courses</label>
+                    <select id="student-courses" multiple>
+                        <!-- Will be populated with available courses -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="student-image">Image URL</label>
+                    <div class="image-upload-container">
+                        <input type="text" id="student-image">
+                        <input type="file" id="student-image-upload" accept="image/*">
+                        <div class="image-preview" id="student-image-preview"></div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Student</button>
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Testimonial Modal -->
+    <div id="testimonial-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="testimonial-modal-title">Add New Testimonial</h2>
+            <form id="testimonial-form">
+                <input type="hidden" id="testimonial-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="testimonial-name">Name</label>
+                        <input type="text" id="testimonial-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="testimonial-role">Role/Relation</label>
+                        <input type="text" id="testimonial-role" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="testimonial-content">Testimonial</label>
+                    <textarea id="testimonial-content" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="testimonial-rating">Rating (1-5)</label>
+                    <div class="rating-stars">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                        <input type="hidden" id="testimonial-rating" value="5">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="testimonial-image">Image URL</label>
+                    <div class="image-upload-container">
+                        <input type="text" id="testimonial-image">
+                        <input type="file" id="testimonial-image-upload" accept="image/*">
+                        <div class="image-preview" id="testimonial-image-preview"></div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Testimonial</button>
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Admin Modal -->
+    <div id="admin-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Add New Admin</h2>
+            <form id="admin-form">
+                <div class="form-group">
+                    <label for="admin-name">Full Name</label>
+                    <input type="text" id="admin-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-email">Email Address</label>
+                    <input type="email" id="admin-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-role">Role</label>
+                    <select id="admin-role">
+                        <option value="super">Super Admin</option>
+                        <option value="content">Content Manager</option>
+                        <option value="viewer">Viewer</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Invite Admin</button>
+                    <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content small">
+            <h3 id="confirm-title">Confirm Action</h3>
+            <p id="confirm-message">Are you sure you want to perform this action?</p>
+            <div class="form-actions">
+                <button id="confirm-yes" class="btn-danger">Yes</button>
+                <button id="confirm-no" class="btn-secondary">No</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alert Toast -->
+    <div id="alert-toast"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/admin.js"></script>
+
+</body>
+</html>
